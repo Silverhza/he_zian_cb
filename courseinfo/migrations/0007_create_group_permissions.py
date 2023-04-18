@@ -10,14 +10,11 @@ def populate_permissions_lists(apps):
     instructor_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
                                                              content_type__model='instructor')
 
-    student_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
-                                                          content_type__model='student')
-
     period_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
-                                                                  content_type__model='period')
+                                                         content_type__model='period')
 
     year_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
-                                                                  content_type__model='year')
+                                                       content_type__model='year')
 
     semester_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
                                                            content_type__model='semester')
@@ -28,24 +25,17 @@ def populate_permissions_lists(apps):
     section_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
                                                           content_type__model='section')
 
-    registration_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
-                                                               content_type__model='registration')
-
     perm_view_instructor = permission_class.objects.filter(content_type__app_label='courseinfo',
                                                            content_type__model='instructor',
                                                            codename='view_instructor')
 
-    perm_view_student = permission_class.objects.filter(content_type__app_label='courseinfo',
-                                                        content_type__model='student',
-                                                        codename='view_student')
-
     perm_view_period = permission_class.objects.filter(content_type__app_label='courseinfo',
-                                                               content_type__model='period',
-                                                               codename='view_period')
+                                                       content_type__model='period',
+                                                       codename='view_period')
 
     perm_view_year = permission_class.objects.filter(content_type__app_label='courseinfo',
-                                                               content_type__model='year',
-                                                               codename='view_year')
+                                                     content_type__model='year',
+                                                     codename='view_year')
 
     perm_view_semester = permission_class.objects.filter(content_type__app_label='courseinfo',
                                                          content_type__model='semester',
@@ -59,36 +49,19 @@ def populate_permissions_lists(apps):
                                                         content_type__model='section',
                                                         codename='view_section')
 
-    perm_view_registration = permission_class.objects.filter(content_type__app_label='courseinfo',
-                                                             content_type__model='registration',
-                                                             codename='view_registration')
-
     ci_user_permissions = chain(perm_view_instructor,
                                 perm_view_period,
                                 perm_view_year,
-                                perm_view_student,
                                 perm_view_semester,
                                 perm_view_course,
-                                perm_view_section,
-                                perm_view_registration)
+                                perm_view_section, )
 
-    ci_scheduler_permissions = chain(instructor_permissions,
-                                     period_permissions,
-                                     year_permissions,
-                                     semester_permissions,
-                                     course_permissions,
-                                     section_permissions,
-                                     perm_view_student,
-                                     perm_view_registration)
-
-    ci_registrar_permissions = chain(student_permissions,
-                                     registration_permissions,
-                                     perm_view_instructor,
-                                     perm_view_period,
-                                     perm_view_year,
-                                     perm_view_course,
-                                     perm_view_semester,
-                                     perm_view_section)
+    ci_admin_permissions = chain(instructor_permissions,
+                                 period_permissions,
+                                 year_permissions,
+                                 semester_permissions,
+                                 course_permissions,
+                                 section_permissions, )
 
     my_groups_initialization_list = [
         {
@@ -96,12 +69,8 @@ def populate_permissions_lists(apps):
             "permissions_list": ci_user_permissions,
         },
         {
-            "name": "ci_scheduler",
-            "permissions_list": ci_scheduler_permissions,
-        },
-        {
-            "name": "ci_registrar",
-            "permissions_list": ci_registrar_permissions,
+            "name": "ci_admin",
+            "permissions_list": ci_admin_permissions,
         },
     ]
     return my_groups_initialization_list

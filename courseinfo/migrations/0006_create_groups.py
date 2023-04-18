@@ -7,10 +7,7 @@ GROUPS = [
         'name': 'ci_user',
     },
     {
-        'name': 'ci_scheduler',
-    },
-    {
-        'name': 'ci_registrar',
+        'name': 'ci_admin',
     },
 ]
 
