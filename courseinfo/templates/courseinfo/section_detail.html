@@ -63,12 +63,12 @@ Section - {{ section }}
                     <a
                             href="{{ section.get_like_update_url }}"
                             class="button button-primary">
-                        Like Section</a></li>
+                        Like</a></li>
                 <li>
                     <a
                             href="{{ section.get_dislike_update_url }}"
                             class="button button-primary">
-                        Dislike Section</a></li>
+                        Dislike</a></li>
             </ul>
 
             <div class="chart-container">
@@ -97,20 +97,22 @@ Section - {{ section }}
                     const ctx = document.getElementById('likeDislikeChart').getContext('2d');
                     const likeDislikeChart = new Chart(ctx, likeDislikeConfig);
                 </script>
+<h3>Comments</h3>
+            {% for review in section.reviews.all %}
+    <div class="review">
+        <p><strong>{{ review.user }}:</strong> {{ review.comment }}</p>
+        <p><small>{{ review.date_created }}</small></p>
+    </div>
+{% empty %}
+    <p>No reviews yet.</p>
+{% endfor %}
 
+<form method="post">
+    {% csrf_token %}
+    {{ review_form.as_p }}
+    <button type="submit" class="button button-primary">Add Comment</button>
+</form>
 
-            <section>
-                <h3>Registrations</h3>
-                <ul>
-                    {% for registration in registration_list %}
-                    <li>
-                        <a href="{{ registration.get_absolute_url }}">{{ registration.student }}</a>
-                    </li>
-                    {% empty %}
-                    <li><em>There are currently no students registered for this section.</em></li>
-                    {% endfor %}
-                </ul>
-            </section>
 
         </div>
     </div> <!-- row -->

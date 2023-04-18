@@ -33,7 +33,9 @@ from courseinfo.views import (
     CourseLikeUpdate,
     CourseDislikeUpdate,
     InstructorLikeUpdate,
-    InstructorDislikeUpdate, SectionLikeUpdate, SectionDislikeUpdate,
+    InstructorDislikeUpdate,
+    SectionLikeUpdate,
+    SectionDislikeUpdate,
 
 )
 

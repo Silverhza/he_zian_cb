@@ -1,11 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from courseinfo.forms import InstructorForm, SectionForm, CourseForm, SemesterForm, RegistrationForm, StudentForm
+from courseinfo.forms import InstructorForm, SectionForm, CourseForm, SemesterForm, RegistrationForm, StudentForm, \
+    InstructorReviewForm, CourseReviewForm, SectionReviewForm
 from courseinfo.models import (
     Instructor,
     Section,
@@ -40,7 +40,20 @@ class InstructorDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 
         context['section_list'] = section_list
         context['instructor_score'] = round(instructor_score, 2)
+        context['review_form'] = InstructorReviewForm()
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = InstructorReviewForm(request.POST)
+        instructor = self.get_object()
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.instructor = instructor
+            review.save()
+            return redirect('courseinfo_instructor_detail_urlpattern', pk=instructor.pk)
+        else:
+            return self.get(request, *args, **kwargs)
 
 
 class InstructorCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -126,9 +139,20 @@ class SectionDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
             section_score = 0
 
         context['section_score'] = round(section_score, 2)
+        context['review_form'] = SectionReviewForm()
         return context
 
-
+    def post(self, request, *args, **kwargs):
+        form = SectionReviewForm(request.POST)
+        section = self.get_object()
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.section = section
+            review.save()
+            return redirect('courseinfo_section_detail_urlpattern', pk=section.pk)
+        else:
+            return self.get(request, *args, **kwargs)
 
 
 class SectionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -210,7 +234,20 @@ class CourseDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 
         context['section_list'] = section_list
         context['course_score'] = round(course_score, 2)
+        context['review_form'] = CourseReviewForm()
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = CourseReviewForm(request.POST)
+        course = self.get_object()
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.course = course
+            review.save()
+            return redirect('courseinfo_course_detail_urlpattern', pk=course.pk)
+        else:
+            return self.get(request, *args, **kwargs)
 
 
 class CourseCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):

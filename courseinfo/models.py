@@ -2,6 +2,9 @@ from django.db import models
 from django.db.models import UniqueConstraint
 from django.urls import reverse
 
+from django.contrib.auth.models import User
+from django.utils import timezone
+
 
 class Period(models.Model):
     period_id = models.AutoField(primary_key=True)
@@ -99,6 +102,16 @@ class Course(models.Model):
         ]
 
 
+class CourseReview(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='reviews')
+    comment = models.TextField()
+    date_created = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Review by {self.user} on {self.date_created}'
+
+
 class Instructor(models.Model):
     instructor_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=45)
@@ -147,6 +160,16 @@ class Instructor(models.Model):
             UniqueConstraint(fields=['last_name', 'first_name', 'disambiguator'],
                              name='unique_instructor')
         ]
+
+
+class InstructorReview(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name='reviews')
+    comment = models.TextField()
+    date_created = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Review by {self.user} on {self.date_created}'
 
 
 class Student(models.Model):
@@ -230,6 +253,16 @@ class Section(models.Model):
             UniqueConstraint(fields=['semester', 'course', 'section_name'],
                              name='unique_section')
         ]
+
+
+class SectionReview(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='reviews')
+    comment = models.TextField()
+    date_created = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Review by {self.user} on {self.date_created}'
 
 
 class Registration(models.Model):

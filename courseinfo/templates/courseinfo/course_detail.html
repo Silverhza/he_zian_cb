@@ -54,12 +54,12 @@
                         <a
                                 href="{{ course.get_like_update_url }}"
                                 class="button button-primary">
-                            Like Course</a></li>
+                            Like</a></li>
                     <li>
                         <a
                                 href="{{ course.get_dislike_update_url }}"
                                 class="button button-primary">
-                            Dislike Course</a></li>
+                            Dislike</a></li>
                 </ul>
                 <div class="chart-container">
                     <canvas id="likeDislikeChart"></canvas>
@@ -100,6 +100,22 @@
                         {% endfor %}
                     </ul>
                 </section>
+                <h3>Comments</h3>
+                {% for review in course.reviews.all %}
+    <div class="review">
+        <p><strong>{{ review.user }}:</strong> {{ review.comment }}</p>
+        <p><small>{{ review.date_created }}</small></p>
+    </div>
+{% empty %}
+    <p>No reviews yet.</p>
+{% endfor %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ review_form.as_p }}
+    <button type="submit" class="button button-primary">Add Comment</button>
+</form>
+
             </div>
         </div> <!-- row -->
 

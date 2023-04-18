@@ -1,6 +1,6 @@
 from django import forms
-
-from courseinfo.models import Instructor, Section, Course, Semester, Student, Registration
+from courseinfo.models import Instructor, Section, Course, Semester, Student, Registration, InstructorReview, \
+    CourseReview, SectionReview
 
 
 class InstructorForm(forms.ModelForm):
@@ -22,6 +22,15 @@ class InstructorForm(forms.ModelForm):
         return result
 
 
+class InstructorReviewForm(forms.ModelForm):
+    class Meta:
+        model = InstructorReview
+        fields = ['comment']
+
+    def clean_comment(self):
+        return self.cleaned_data['comment'].strip()
+
+
 class SectionForm(forms.ModelForm):
     class Meta:
         model = Section
@@ -29,6 +38,15 @@ class SectionForm(forms.ModelForm):
 
     def clean_section_name(self):
         return self.cleaned_data['section_name'].strip()
+
+
+class SectionReviewForm(forms.ModelForm):
+    class Meta:
+        model = SectionReview
+        fields = ['comment']
+
+    def clean_comment(self):
+        return self.cleaned_data['comment'].strip()
 
 
 class CourseForm(forms.ModelForm):
@@ -41,6 +59,15 @@ class CourseForm(forms.ModelForm):
 
     def clean_course_name(self):
         return self.cleaned_data['course_name'].strip()
+
+
+class CourseReviewForm(forms.ModelForm):
+    class Meta:
+        model = CourseReview
+        fields = ['comment']
+
+    def clean_comment(self):
+        return self.cleaned_data['comment'].strip()
 
 
 class SemesterForm(forms.ModelForm):
