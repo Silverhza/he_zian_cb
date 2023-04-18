@@ -1,5 +1,5 @@
 """
-ASGI config for he_zian_ezu project.
+ASGI config for he_zian_cb project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'he_zian_ezu.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'he_zian_cb.settings')
 
 application = get_asgi_application()

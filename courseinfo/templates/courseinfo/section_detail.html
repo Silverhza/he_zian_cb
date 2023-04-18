@@ -1,67 +1,119 @@
 {% extends 'courseinfo/base.html' %}
 
 {% block title %}
-    Section - {{ section }}
+Section - {{ section }}
 {% endblock %}
 
 {% block content %}
-    <article>
-        <div class="row">
-            <div class="offset-by-two eight columns">
-                <h2>{{ section }}</h2>
-                <ul class="inline">
-                    {% if perms.courseinfo.change_section %}
-                    <li>
-                        <a href="{{ section.get_update_url }}"
-                           class="button button-primary">
-                            Edit Section</a></li>
-                    {% endif %}
-                {% if perms.courseinfo.delete_section %}
-                    <li>
-                        <a href="{{ section.get_delete_url }}"
-                           class="button button-primary">
-                            Delete Section</a></li>
-                {% endif %}
-                </ul>
-
-                   <section>
-        <table>
-            <tr>
-                <th>Course:</th>
-                <td><a href="{{ course.get_absolute_url }}">{{ course }}</a></td>
-            </tr>
-            <tr>
-                <th>Section Name:</th>
-                <td>{{ section.section_name }}</td>
-            </tr>
-            <tr>
-                <th>Semester:</th>
-                <td><a href="{{ semester.get_absolute_url }}">{{ semester }}</a></td>
-            </tr>
-
-            <tr>
-                <th>Instructor:</th>
-                <td><a href="{{ instructor.get_absolute_url }}">{{ instructor }}</a></td>
-            </tr>
-        </table>
-
-    </section>
-
-    <section>
-        <h3>Registrations</h3>
-        <ul>
-            {% for registration in registration_list %}
+<article>
+    <div class="row">
+        <div class="offset-by-two eight columns">
+            <h2>{{ section }}</h2>
+            <ul class="inline">
+                {% if perms.courseinfo.change_section %}
                 <li>
-                    <a href="{{ registration.get_absolute_url }}">{{ registration.student }}</a>
-                </li>
-            {% empty %}
-                <li><em>There are currently no students registered for this section.</em></li>
-            {% endfor %}
-        </ul>
-    </section>
+                    <a href="{{ section.get_update_url }}"
+                       class="button button-primary">
+                        Edit Section</a></li>
+                {% endif %}
+                {% if perms.courseinfo.delete_section %}
+                <li>
+                    <a href="{{ section.get_delete_url }}"
+                       class="button button-primary">
+                        Delete Section</a></li>
+                {% endif %}
+            </ul>
 
-            </div>
-        </div> <!-- row -->
+            <section>
+                <table>
+                    <tr>
+                        <th>Course:</th>
+                        <td><a href="{{ course.get_absolute_url }}">{{ course }}</a></td>
+                    </tr>
+                    <tr>
+                        <th>Section Name:</th>
+                        <td>{{ section.section_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Semester:</th>
+                        <td><a href="{{ semester.get_absolute_url }}">{{ semester }}</a></td>
+                    </tr>
 
-    </article>
+                    <tr>
+                        <th>Instructor:</th>
+                        <td><a href="{{ instructor.get_absolute_url }}">{{ instructor }}</a></td>
+                    </tr>
+                    <tr>
+                        <th>Section Like:</th>
+                        <td>{{ section.section_like }}</td>
+                    </tr>
+                    <tr>
+                        <th>Section Dislike:</th>
+                        <td>{{ section.section_dislike }}</td>
+                    </tr>
+                    <tr>
+                        <th>Section Score:</th>
+                        <td>{{ section_score }}</td>
+                    </tr>
+                </table>
+
+            </section>
+            <ul class="inline">
+                <li>
+                    <a
+                            href="{{ section.get_like_update_url }}"
+                            class="button button-primary">
+                        Like Section</a></li>
+                <li>
+                    <a
+                            href="{{ section.get_dislike_update_url }}"
+                            class="button button-primary">
+                        Dislike Section</a></li>
+            </ul>
+
+            <div class="chart-container">
+                    <canvas id="likeDislikeChart"></canvas>
+                </div>
+                <script>
+                    const likeDislikeData = {
+                        labels: ['Likes', 'Dislikes'],
+                        datasets: [{
+                            data: [{{ section.section_like }}, {{ section.section_dislike }}],
+                            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                            borderWidth: 1
+                        }]
+                    };
+
+                    const likeDislikeConfig = {
+                        type: 'pie',
+                        data: likeDislikeData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    };
+
+                    const ctx = document.getElementById('likeDislikeChart').getContext('2d');
+                    const likeDislikeChart = new Chart(ctx, likeDislikeConfig);
+                </script>
+
+
+            <section>
+                <h3>Registrations</h3>
+                <ul>
+                    {% for registration in registration_list %}
+                    <li>
+                        <a href="{{ registration.get_absolute_url }}">{{ registration.student }}</a>
+                    </li>
+                    {% empty %}
+                    <li><em>There are currently no students registered for this section.</em></li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+        </div>
+    </div> <!-- row -->
+
+</article>
 {% endblock %}

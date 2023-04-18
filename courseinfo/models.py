@@ -64,11 +64,6 @@ class Course(models.Model):
     course_dislike = models.CharField(max_length=255, default=0)
     course_score = models.FloatField(max_length=255, default=100)
 
-    @property
-    def score_values(self):
-        self.course_score = self.course_like / (self.course_like + self.course_dislike) * 100
-        return self.course_score
-
     def __str__(self):
         return '%s - %s' % (self.course_number, self.course_name)
 
@@ -109,6 +104,9 @@ class Instructor(models.Model):
     first_name = models.CharField(max_length=45)
     last_name = models.CharField(max_length=45)
     disambiguator = models.CharField(max_length=45, blank=True, default='')
+    instructor_like = models.CharField(max_length=255, default=1)
+    instructor_dislike = models.CharField(max_length=255, default=0)
+    instructor_score = models.FloatField(max_length=255, default=100)
 
     def __str__(self):
         result = ''
@@ -125,6 +123,16 @@ class Instructor(models.Model):
 
     def get_update_url(self):
         return reverse('courseinfo_instructor_update_urlpattern',
+                       kwargs={'pk': self.pk}
+                       )
+
+    def get_like_update_url(self):
+        return reverse('courseinfo_instructor_like_update_urlpattern',
+                       kwargs={'pk': self.pk}
+                       )
+
+    def get_dislike_update_url(self):
+        return reverse('courseinfo_instructor_dislike_update_urlpattern',
                        kwargs={'pk': self.pk}
                        )
 
@@ -184,6 +192,9 @@ class Section(models.Model):
     semester = models.ForeignKey(Semester, related_name='sections', on_delete=models.PROTECT)
     course = models.ForeignKey(Course, related_name='sections', on_delete=models.PROTECT)
     instructor = models.ForeignKey(Instructor, related_name='sections', on_delete=models.PROTECT)
+    section_like = models.CharField(max_length=255, default=1)
+    section_dislike = models.CharField(max_length=255, default=0)
+    section_score = models.FloatField(max_length=255, default=100)
 
     def __str__(self):
         return '%s - %s (%s)' % (self.course.course_number, self.section_name, self.semester.__str__())
@@ -195,6 +206,16 @@ class Section(models.Model):
 
     def get_update_url(self):
         return reverse('courseinfo_section_update_urlpattern',
+                       kwargs={'pk': self.pk}
+                       )
+
+    def get_like_update_url(self):
+        return reverse('courseinfo_section_like_update_urlpattern',
+                       kwargs={'pk': self.pk}
+                       )
+
+    def get_dislike_update_url(self):
+        return reverse('courseinfo_section_dislike_update_urlpattern',
                        kwargs={'pk': self.pk}
                        )
 

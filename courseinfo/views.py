@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.db import transaction
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -27,10 +28,18 @@ class InstructorDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     permission_required = 'courseinfo.view_instructor'
 
     def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         instructor = self.get_object()
         section_list = instructor.sections.all()
+
+        total_likes_dislikes = int(instructor.instructor_like) + int(instructor.instructor_dislike)
+        if int(total_likes_dislikes) > 0:
+            instructor_score = (int(instructor.instructor_like) / int(total_likes_dislikes)) * 100
+        else:
+            instructor_score = 0
+
         context['section_list'] = section_list
+        context['instructor_score'] = round(instructor_score, 2)
         return context
 
 
@@ -45,6 +54,24 @@ class InstructorUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Instructor
     template_name = 'courseinfo/instructor_form_update.html'
     permission_required = 'courseinfo.change_instructor'
+
+
+class InstructorLikeUpdate(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        instructor = get_object_or_404(Instructor, pk=pk)
+        instructor.instructor_like = int(instructor.instructor_like) + 1
+        instructor.save()
+        return redirect('courseinfo_instructor_detail_urlpattern', pk=instructor.pk)
+
+
+class InstructorDislikeUpdate(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        instructor = get_object_or_404(Instructor, pk=pk)
+        instructor.instructor_dislike = int(instructor.instructor_dislike) + 1
+        instructor.save()
+        return redirect('courseinfo_instructor_detail_urlpattern', pk=instructor.pk)
 
 
 class InstructorDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -81,7 +108,7 @@ class SectionDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     permission_required = 'courseinfo.view_section'
 
     def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         section = self.get_object()
         semester = section.semester
         course = section.course
@@ -91,7 +118,17 @@ class SectionDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
         context['course'] = course
         context['instructor'] = instructor
         context['registration_list'] = registration_list
+
+        total_likes_dislikes = int(section.section_like) + int(section.section_dislike)
+        if int(total_likes_dislikes) > 0:
+            section_score = (int(section.section_like) / int(total_likes_dislikes)) * 100
+        else:
+            section_score = 0
+
+        context['section_score'] = round(section_score, 2)
         return context
+
+
 
 
 class SectionCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -105,6 +142,24 @@ class SectionUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Section
     template_name = 'courseinfo/section_form_update.html'
     permission_required = 'courseinfo.change_section'
+
+
+class SectionLikeUpdate(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        section = get_object_or_404(Section, pk=pk)
+        section.section_like = int(section.section_like) + 1
+        section.save()
+        return redirect('courseinfo_section_detail_urlpattern', pk=section.pk)
+
+
+class SectionDislikeUpdate(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        section = get_object_or_404(Section, pk=pk)
+        section.section_dislike = int(section.section_dislike) + 1
+        section.save()
+        return redirect('courseinfo_section_detail_urlpattern', pk=section.pk)
 
 
 class SectionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
@@ -161,7 +216,7 @@ class CourseDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 class CourseCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     form_class = CourseForm
     model = Course
-    ermission_required = 'courseinfo.add_course'
+    permission_required = 'courseinfo.add_course'
 
 
 class CourseUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
@@ -175,7 +230,7 @@ class CourseLikeUpdate(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         pk = kwargs['pk']
         course = get_object_or_404(Course, pk=pk)
-        course.course_like = int(course.course_like)+1
+        course.course_like = int(course.course_like) + 1
         course.save()
         return redirect('courseinfo_course_detail_urlpattern', pk=course.pk)
 
@@ -184,7 +239,7 @@ class CourseDislikeUpdate(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         pk = kwargs['pk']
         course = get_object_or_404(Course, pk=pk)
-        course.course_dislike = int(course.course_dislike)+1
+        course.course_dislike = int(course.course_dislike) + 1
         course.save()
         return redirect('courseinfo_course_detail_urlpattern', pk=course.pk)
 
