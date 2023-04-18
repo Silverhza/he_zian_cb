@@ -172,43 +172,6 @@ class InstructorReview(models.Model):
         return f'Review by {self.user} on {self.date_created}'
 
 
-class Student(models.Model):
-    student_id = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=45)
-    last_name = models.CharField(max_length=45)
-    disambiguator = models.CharField(max_length=45, blank=True, default='')
-
-    def __str__(self):
-        result = ''
-        if self.disambiguator == '':
-            result = '%s, %s' % (self.last_name, self.first_name)
-        else:
-            result = '%s, %s (%s)' % (self.last_name, self.first_name, self.disambiguator)
-        return result
-
-    def get_absolute_url(self):
-        return reverse('courseinfo_student_detail_urlpattern',
-                       kwargs={'pk': self.pk}
-                       )
-
-    def get_update_url(self):
-        return reverse('courseinfo_student_update_urlpattern',
-                       kwargs={'pk': self.pk}
-                       )
-
-    def get_delete_url(self):
-        return reverse('courseinfo_student_delete_urlpattern',
-                       kwargs={'pk': self.pk}
-                       )
-
-    class Meta:
-        ordering = ['last_name', 'first_name', 'disambiguator']
-        constraints = [
-            UniqueConstraint(fields=['last_name', 'first_name', 'disambiguator'],
-                             name='unique_student')
-        ]
-
-
 class Section(models.Model):
     section_id = models.AutoField(primary_key=True)
     section_name = models.CharField(max_length=20)
@@ -263,34 +226,3 @@ class SectionReview(models.Model):
 
     def __str__(self):
         return f'Review by {self.user} on {self.date_created}'
-
-
-class Registration(models.Model):
-    registration_id = models.AutoField(primary_key=True)
-    student = models.ForeignKey(Student, related_name='registrations', on_delete=models.PROTECT)
-    section = models.ForeignKey(Section, related_name='registrations', on_delete=models.PROTECT)
-
-    def __str__(self):
-        return '%s / %s' % (self.section, self.student)
-
-    def get_absolute_url(self):
-        return reverse('courseinfo_registration_detail_urlpattern',
-                       kwargs={'pk': self.pk}
-                       )
-
-    def get_update_url(self):
-        return reverse('courseinfo_registration_update_urlpattern',
-                       kwargs={'pk': self.pk}
-                       )
-
-    def get_delete_url(self):
-        return reverse('courseinfo_registration_delete_urlpattern',
-                       kwargs={'pk': self.pk}
-                       )
-
-    class Meta:
-        ordering = ['section', 'student']
-        constraints = [
-            UniqueConstraint(fields=['section', 'student'],
-                             name='unique_registration')
-        ]

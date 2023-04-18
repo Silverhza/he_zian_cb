@@ -15,6 +15,14 @@
 
 {% block org_content %}
     <h2>Section List</h2>
+    <form method="get" class="search-form">
+        {{ search_form.as_p }}
+        <select name="order_by" onchange="this.form.submit();">
+            <option value="-section_score" {% if order_by == "-section_score" %}selected{% endif %}>Sort by Score</option>
+            <option value="alphabetical" {% if order_by == "alphabetical" %}selected{% endif %}>Sort Alphabetically</option>
+        </select>
+        <button type="submit" class="button button-primary">Search</button>
+    </form>
     {% if perms.courseinfo.add_section %}
         <div class="mobile">
             <a
@@ -27,7 +35,7 @@
         {% for section in section_list %}
             <li>
                 <a href="{{ section.get_absolute_url }}">
-                    {{ section }}</a>
+                    {{ section }} (Score: {{ section.section_score }})</a>
             </li>
         {% empty %}
             <li><em>There are currently no sections available.</em></li>

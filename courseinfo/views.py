@@ -3,16 +3,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.db.models import Q
 
-from courseinfo.forms import InstructorForm, SectionForm, CourseForm, SemesterForm, RegistrationForm, StudentForm, \
-    InstructorReviewForm, CourseReviewForm, SectionReviewForm
+from courseinfo.forms import InstructorForm, SectionForm, CourseForm, SemesterForm, InstructorReviewForm, \
+    CourseReviewForm, SectionReviewForm, InstructorSearchForm, SectionSearchForm, CourseSearchForm
 from courseinfo.models import (
     Instructor,
     Section,
     Course,
     Semester,
-    Student,
-    Registration,
 )
 from courseinfo.utils import PageLinksMixin
 
@@ -21,6 +20,33 @@ class InstructorList(LoginRequiredMixin, PermissionRequiredMixin, PageLinksMixin
     paginate_by = 25
     model = Instructor
     permission_required = 'courseinfo.view_instructor'
+
+    def get_order_by(self):
+        order_by = self.request.GET.get('order_by', '-instructor_score')
+        if order_by == 'alphabetical':
+            return ['last_name', 'first_name']
+        else:
+            return ['-instructor_score', 'last_name', 'first_name']
+
+    def get_queryset(self):
+        search_query = self.request.GET.get('search_query', '')
+        order_by = self.get_order_by()
+
+        queryset = Instructor.objects.all()
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query)
+            )
+
+        return queryset.order_by(*order_by)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order_by'] = self.request.GET.get('order_by', '-instructor_score')
+        context['search_form'] = InstructorSearchForm(self.request.GET)
+        return context
 
 
 class InstructorDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -35,9 +61,11 @@ class InstructorDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
         total_likes_dislikes = int(instructor.instructor_like) + int(instructor.instructor_dislike)
         if int(total_likes_dislikes) > 0:
             instructor_score = (int(instructor.instructor_like) / int(total_likes_dislikes)) * 100
+            instructor.instructor_score = round(instructor_score, 2)
         else:
             instructor_score = 0
-
+            instructor.instructor_score = round(instructor_score, 2)
+        instructor.save()
         context['section_list'] = section_list
         context['instructor_score'] = round(instructor_score, 2)
         context['review_form'] = InstructorReviewForm()
@@ -112,8 +140,36 @@ class InstructorDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
 
 class SectionList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    paginate_by = 25
     model = Section
     permission_required = 'courseinfo.view_section'
+
+    def get_order_by(self):
+        order_by = self.request.GET.get('order_by', '-section_score')
+        if order_by == 'alphabetical':
+            return ['course', 'section_name']
+        else:
+            return ['-section_score', 'course', 'section_name']
+
+    def get_queryset(self):
+        search_query = self.request.GET.get('search_query', '')
+        order_by = self.get_order_by()
+
+        queryset = Section.objects.all()
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(section_name__icontains=search_query) |
+                Q(course__course_number__icontains=search_query)
+            )
+
+        return queryset.order_by(*order_by)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order_by'] = self.request.GET.get('order_by', '-section_score')
+        context['search_form'] = SectionSearchForm(self.request.GET)
+        return context
 
 
 class SectionDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -126,18 +182,19 @@ class SectionDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
         semester = section.semester
         course = section.course
         instructor = section.instructor
-        registration_list = section.registrations.all()
         context['semester'] = semester
         context['course'] = course
         context['instructor'] = instructor
-        context['registration_list'] = registration_list
 
         total_likes_dislikes = int(section.section_like) + int(section.section_dislike)
         if int(total_likes_dislikes) > 0:
             section_score = (int(section.section_like) / int(total_likes_dislikes)) * 100
+            section.section_score = round(section_score, 2)
         else:
             section_score = 0
+            section.section_score = round(section_score, 2)
 
+        section.save()
         context['section_score'] = round(section_score, 2)
         context['review_form'] = SectionReviewForm()
         return context
@@ -195,26 +252,44 @@ class SectionDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         section = get_object_or_404(
             Section,
             pk=pk)
-        registrations = section.registrations.all()
-        if registrations.count() > 0:
-            return render(
-                request,
-                'courseinfo/section_refuse_delete.html',
-                {'section': section,
-                 'registrations': registrations,
-                 }
-            )
-        else:
-            return render(
-                request,
-                'courseinfo/section_confirm_delete.html',
-                {'section': section}
-            )
+        return render(
+            request,
+            'courseinfo/section_confirm_delete.html',
+            {'section': section}
+        )
 
 
 class CourseList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    paginate_by = 25
     model = Course
     permission_required = 'courseinfo.view_course'
+
+    def get_order_by(self):
+        order_by = self.request.GET.get('order_by', '-course_score')
+        if order_by == 'alphabetical':
+            return ['course_number', 'course_name']
+        else:
+            return ['-course_score', 'course_number', 'course_name']
+
+    def get_queryset(self):
+        search_query = self.request.GET.get('search_query', '')
+        order_by = self.get_order_by()
+
+        queryset = Course.objects.all()
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(course_name__icontains=search_query) |
+                Q(course_number__icontains=search_query)
+            )
+
+        return queryset.order_by(*order_by)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order_by'] = self.request.GET.get('order_by', '-course_score')
+        context['search_form'] = CourseSearchForm(self.request.GET)
+        return context
 
 
 class CourseDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -229,9 +304,12 @@ class CourseDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
         total_likes_dislikes = int(course.course_like) + int(course.course_dislike)
         if int(total_likes_dislikes) > 0:
             course_score = (int(course.course_like) / int(total_likes_dislikes)) * 100
+            course.course_score = round(course_score, 2)
         else:
             course_score = 0
+            course.course_score = round(course_score, 2)
 
+        course.save()
         context['section_list'] = section_list
         context['course_score'] = round(course_score, 2)
         context['review_form'] = CourseReviewForm()
@@ -361,98 +439,3 @@ class SemesterDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
                 'courseinfo/semester_confirm_delete.html',
                 {'semester': semester}
             )
-
-
-class StudentList(LoginRequiredMixin, PermissionRequiredMixin, PageLinksMixin, ListView):
-    paginate_by = 25
-    model = Student
-    permission_required = 'courseinfo.view_student'
-
-
-class StudentDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
-    model = Student
-    permission_required = 'courseinfo.view_student'
-
-    def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
-        student = self.get_object()
-        registration_list = student.registrations.all()
-        context['registration_list'] = registration_list
-        return context
-
-
-class StudentCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    form_class = StudentForm
-    model = Student
-    permission_required = 'courseinfo.add_student'
-
-
-class StudentUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    form_class = StudentForm
-    model = Student
-    template_name = 'courseinfo/student_form_update.html'
-    permission_required = 'courseinfo.change_student'
-
-
-class StudentDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    model = Student
-    success_url = reverse_lazy('courseinfo_student_list_urlpattern')
-    permission_required = 'courseinfo.delete_student'
-
-    def get(self, request, pk):
-        student = get_object_or_404(
-            Student,
-            pk=pk)
-        registrations = student.registrations.all()
-        if registrations.count() > 0:
-            return render(
-                request,
-                'courseinfo/student_refuse_delete.html',
-                {'student': student,
-                 'registrations': registrations,
-                 }
-            )
-        else:
-            return render(
-                request,
-                'courseinfo/student_confirm_delete.html',
-                {'student': student}
-            )
-
-
-class RegistrationList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
-    model = Registration
-    permission_required = 'courseinfo.view_registration'
-
-
-class RegistrationDetail(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
-    model = Registration
-    permission_required = 'courseinfo.view_registration'
-
-    def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
-        registration = self.get_object()
-        student = registration.student
-        section = registration.section
-        context['student'] = student
-        context['section'] = section
-        return context
-
-
-class RegistrationCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    form_class = RegistrationForm
-    model = Registration
-    permission_required = 'courseinfo.add_registration'
-
-
-class RegistrationUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    form_class = RegistrationForm
-    model = Registration
-    template_name = 'courseinfo/registration_form_update.html'
-    permission_required = 'courseinfo.change_registration'
-
-
-class RegistrationDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    model = Registration
-    success_url = reverse_lazy('courseinfo_registration_list_urlpattern')
-    permission_required = 'courseinfo.delete_registration'

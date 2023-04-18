@@ -15,6 +15,14 @@
 
 {% block org_content %}
     <h2>Instructor List</h2>
+    <form method="get" class="search-form">
+        {{ search_form.as_p }}
+        <select name="order_by" onchange="this.form.submit();">
+            <option value="-instructor_score" {% if order_by == "-instructor_score" %}selected{% endif %}>Sort by Score</option>
+            <option value="alphabetical" {% if order_by == "alphabetical" %}selected{% endif %}>Sort Alphabetically</option>
+        </select>
+        <button type="submit" class="button button-primary">Search</button>
+    </form>
     {% if perms.courseinfo.add_instructor %}
         <div class="mobile">
             <a
@@ -27,7 +35,7 @@
         {% for instructor in instructor_list %}
             <li>
                 <a href="{{ instructor.get_absolute_url }}">
-                    {{ instructor }}</a>
+                    {{ instructor }} (Score: {{ instructor.instructor_score }})</a>
             </li>
         {% empty %}
             <li><em>There are currently no instructors available.</em></li>

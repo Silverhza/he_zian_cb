@@ -15,6 +15,14 @@
 
 {% block org_content %}
   <h2>Course List</h2>
+    <form method="get" class="search-form">
+        {{ search_form.as_p }}
+        <select name="order_by" onchange="this.form.submit();">
+            <option value="-course_score" {% if order_by == "-course_score" %}selected{% endif %}>Sort by Score</option>
+            <option value="alphabetical" {% if order_by == "alphabetical" %}selected{% endif %}>Sort Alphabetically</option>
+        </select>
+        <button type="submit" class="button button-primary">Search</button>
+    </form>
     {% if perms.courseinfo.add_course %}
     <div class="mobile">
       <a
@@ -27,7 +35,7 @@
     {% for course in course_list %}
       <li>
         <a href="{{ course.get_absolute_url }}">
-          {{ course }}</a>
+          {{ course }} (Score: {{ course.course_score }})</a>
       </li>
     {% empty %}
       <li><em>There are currently no courses available.</em></li>

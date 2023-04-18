@@ -1,6 +1,5 @@
 from django import forms
-from courseinfo.models import Instructor, Section, Course, Semester, Student, Registration, InstructorReview, \
-    CourseReview, SectionReview
+from courseinfo.models import Instructor, Section, Course, Semester, InstructorReview, CourseReview, SectionReview
 
 
 class InstructorForm(forms.ModelForm):
@@ -31,6 +30,15 @@ class InstructorReviewForm(forms.ModelForm):
         return self.cleaned_data['comment'].strip()
 
 
+class InstructorSearchForm(forms.Form):
+    search_query = forms.CharField(
+        label='',
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Search Instructor'})
+    )
+
+
 class SectionForm(forms.ModelForm):
     class Meta:
         model = Section
@@ -38,6 +46,15 @@ class SectionForm(forms.ModelForm):
 
     def clean_section_name(self):
         return self.cleaned_data['section_name'].strip()
+
+
+class SectionSearchForm(forms.Form):
+    search_query = forms.CharField(
+        label='',
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Search Section'})
+    )
 
 
 class SectionReviewForm(forms.ModelForm):
@@ -70,32 +87,16 @@ class CourseReviewForm(forms.ModelForm):
         return self.cleaned_data['comment'].strip()
 
 
+class CourseSearchForm(forms.Form):
+    search_query = forms.CharField(
+        label='',
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Course Section'})
+    )
+
+
 class SemesterForm(forms.ModelForm):
     class Meta:
         model = Semester
-        fields = '__all__'
-
-
-class StudentForm(forms.ModelForm):
-    class Meta:
-        model = Student
-        fields = '__all__'
-
-    def clean_first_name(self):
-        return self.cleaned_data['first_name'].strip()
-
-    def clean_last_name(self):
-        return self.cleaned_data['last_name'].strip()
-
-    def clean_disambiguator(self):
-        if len(self.cleaned_data['disambiguator']) == 0:
-            result = self.cleaned_data['disambiguator']
-        else:
-            result = self.cleaned_data['disambiguator'].strip()
-        return result
-
-
-class RegistrationForm(forms.ModelForm):
-    class Meta:
-        model = Registration
         fields = '__all__'
