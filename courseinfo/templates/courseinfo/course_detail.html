@@ -1,0 +1,106 @@
+{% extends 'courseinfo/base.html' %}
+
+{% block title %}
+    Course - {{ course }}
+{% endblock %}
+
+{% block content %}
+    <article>
+        <div class="row">
+            <div class="offset-by-two eight columns">
+                <h2>{{ course }}</h2>
+                <ul class="inline">
+                    {% if perms.courseinfo.change_course %}
+                        <li>
+                            <a
+                                    href="{{ course.get_update_url }}"
+                                    class="button button-primary">
+                                Edit Course</a></li>
+                    {% endif %}
+                    {% if perms.courseinfo.delete_course %}
+                        <li>
+                            <a
+                                    href="{{ course.get_delete_url }}"
+                                    class="button button-primary">
+                                Delete Course</a></li>
+                    {% endif %}
+                </ul>
+                <section>
+                    <table>
+                        <tr>
+                            <th>Course Number:</th>
+                            <td>{{ course.course_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Course Name:</th>
+                            <td>{{ course.course_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Course Like:</th>
+                            <td>{{ course.course_like }}</td>
+                        </tr>
+                        <tr>
+                            <th>Course Dislike:</th>
+                            <td>{{ course.course_dislike }}</td>
+                        </tr>
+                        <tr>
+                            <th>Course Score:</th>
+                            <td>{{ course_score }}</td>
+                        </tr>
+                    </table>
+                </section>
+                <ul class="inline">
+                    <li>
+                        <a
+                                href="{{ course.get_like_update_url }}"
+                                class="button button-primary">
+                            Like Course</a></li>
+                    <li>
+                        <a
+                                href="{{ course.get_dislike_update_url }}"
+                                class="button button-primary">
+                            Dislike Course</a></li>
+                </ul>
+                <div class="chart-container">
+                    <canvas id="likeDislikeChart"></canvas>
+                </div>
+                <script>
+                    const likeDislikeData = {
+                        labels: ['Likes', 'Dislikes'],
+                        datasets: [{
+                            data: [{{ course.course_like }}, {{ course.course_dislike }}],
+                            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                            borderWidth: 1
+                        }]
+                    };
+
+                    const likeDislikeConfig = {
+                        type: 'pie',
+                        data: likeDislikeData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    };
+
+                    const ctx = document.getElementById('likeDislikeChart').getContext('2d');
+                    const likeDislikeChart = new Chart(ctx, likeDislikeConfig);
+                </script>
+                <section>
+                    <h3>Sections</h3>
+                    <ul>
+                        {% for section in section_list %}
+                            <li>
+                                <a href="{{ section.get_absolute_url }}">{{ section }}</a>
+                            </li>
+                        {% empty %}
+                            <li><em>There are currently no sections for this course.</em></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
+        </div> <!-- row -->
+
+    </article>
+{% endblock %}
