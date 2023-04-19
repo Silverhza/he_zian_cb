@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('courseinfo', '0007_create_group_permissions'),
+        ('courseinfo', '0006_create_group_permissions'),
     ]
 
     operations = [

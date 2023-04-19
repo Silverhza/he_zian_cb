@@ -38,15 +38,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Student',
-            fields=[
-                ('student_id', models.AutoField(primary_key=True, serialize=False)),
-                ('first_name', models.CharField(max_length=45)),
-                ('last_name', models.CharField(max_length=45)),
-                ('disambiguator', models.CharField(blank=True, default='', max_length=45)),
-            ],
-        ),
-        migrations.CreateModel(
             name='Year',
             fields=[
                 ('year_id', models.AutoField(primary_key=True, serialize=False)),
@@ -69,14 +60,6 @@ class Migration(migrations.Migration):
                 ('course', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='sections', to='courseinfo.course')),
                 ('instructor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='sections', to='courseinfo.instructor')),
                 ('semester', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='sections', to='courseinfo.semester')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='Registration',
-            fields=[
-                ('registration_id', models.AutoField(primary_key=True, serialize=False)),
-                ('section', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='registrations', to='courseinfo.section')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='registrations', to='courseinfo.student')),
             ],
         ),
     ]

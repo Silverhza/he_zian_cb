@@ -22,6 +22,15 @@ def populate_permissions_lists(apps):
     course_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
                                                          content_type__model='course')
 
+    coursereview_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
+                                                               content_type__model='coursereview')
+
+    instructorreview_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
+                                                                   content_type__model='instructorreview')
+
+    sectionreview_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
+                                                                content_type__model='sectionreview')
+
     section_permissions = permission_class.objects.filter(content_type__app_label='courseinfo',
                                                           content_type__model='section')
 
@@ -49,19 +58,42 @@ def populate_permissions_lists(apps):
                                                         content_type__model='section',
                                                         codename='view_section')
 
+    perm_view_coursereview = permission_class.objects.filter(content_type__app_label='courseinfo',
+                                                             content_type__model='coursereview',
+                                                             codename='view_coursereview')
+
+    perm_view_instructorreview = permission_class.objects.filter(content_type__app_label='courseinfo',
+                                                                 content_type__model='instructorreview',
+                                                                 codename='view_instructorreview')
+
+    perm_view_sectionreview = permission_class.objects.filter(content_type__app_label='courseinfo',
+                                                              content_type__model='sectionreview',
+                                                              codename='view_sectionreview')
     ci_user_permissions = chain(perm_view_instructor,
                                 perm_view_period,
                                 perm_view_year,
                                 perm_view_semester,
                                 perm_view_course,
-                                perm_view_section, )
+                                perm_view_section,
+                                perm_view_coursereview,
+                                perm_view_instructorreview,
+                                perm_view_sectionreview,
+                                coursereview_permissions,
+                                instructorreview_permissions,
+                                sectionreview_permissions,)
 
     ci_admin_permissions = chain(instructor_permissions,
                                  period_permissions,
                                  year_permissions,
                                  semester_permissions,
                                  course_permissions,
-                                 section_permissions, )
+                                 section_permissions,
+                                 perm_view_coursereview,
+                                 perm_view_instructorreview,
+                                 perm_view_sectionreview,
+                                 coursereview_permissions,
+                                 instructorreview_permissions,
+                                 sectionreview_permissions,)
 
     my_groups_initialization_list = [
         {
@@ -106,7 +138,7 @@ def remove_group_permissions_data(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('courseinfo', '0006_create_groups'),
+        ('courseinfo', '0005_create_groups'),
     ]
 
     operations = [
