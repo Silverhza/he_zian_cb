@@ -10,11 +10,11 @@ Course Bench is a comprehensive platform designed to enhance the learning experi
 
 ## Authentication and Authorization Scheme
 
-![users_for_cb](.\document\users_for_cb.png)
+![users_for_cb](./document/users_for_cb.png)
 
-![groups_permissions_for_cb_1](.\document\groups_permissions_for_cb_1.png)
+![groups_permissions_for_cb_1](./document/groups_permissions_for_cb_1.png)
 
-![groups_permissions_for_cb_2](.\document\groups_permissions_for_cb_2.png)
+![groups_permissions_for_cb_2](./document/groups_permissions_for_cb_2.png)
 
 ## User IDs and Passwords
 
