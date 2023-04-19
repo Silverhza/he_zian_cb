@@ -29,6 +29,7 @@ from courseinfo.views import (
 
 )
 
+
 urlpatterns = [
     path('instructor/',
          InstructorList.as_view(),

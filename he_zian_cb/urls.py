@@ -6,7 +6,7 @@ from django.views.generic import RedirectView, TemplateView
 urlpatterns = [
     path('',
          RedirectView.as_view(
-             pattern_name='about_urlpattern',
+             pattern_name='home_urlpattern',
              permanent=False
          )),
     path('login/',
@@ -21,6 +21,11 @@ urlpatterns = [
          TemplateView.as_view(
              template_name='courseinfo/about.html'),
          name='about_urlpattern'
+         ),
+    path('home/',
+         TemplateView.as_view(
+             template_name='courseinfo/home.html'),
+         name='home_urlpattern'
          ),
     path('admin/', admin.site.urls),
     path('', include('courseinfo.urls')),

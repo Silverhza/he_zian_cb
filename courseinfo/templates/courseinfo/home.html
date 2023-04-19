@@ -1,0 +1,14 @@
+{% extends 'courseinfo/base.html' %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="offset-by-two eight columns">
+        <h2>Welcome {{ user.get_username }}!</h2>
+        <img src="https://www.illinitoweruiuc.com/wp-content/uploads/sites/25/2022/11/UIUC-Housing-Guide.jpg" style="max-width:100%; height:auto; display:block; margin: 0 auto;">
+    </div>
+</div>
+{% endblock %}

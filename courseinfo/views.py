@@ -11,7 +11,7 @@ from courseinfo.models import (
     Instructor,
     Section,
     Course,
-    Semester,
+    Semester
 )
 from courseinfo.utils import PageLinksMixin
 
