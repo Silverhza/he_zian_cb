@@ -12,15 +12,15 @@ Instructor - {{ instructor }}
             <ul class="inline">
                 {% if perms.courseinfo.change_instructor %}
                 <li>
-                    <a href="{{ instructor.get_update_url }}"
-                       class="button button-primary">
-                        Edit Instructor</a></li>
+                    <a href="{{ instructor.get_update_url }}" class="button button-primary">
+                        Edit Instructor</a>
+                </li>
                 {% endif %}
                 {% if perms.courseinfo.delete_instructor %}
                 <li>
-                    <a href="{{ instructor.get_delete_url }}"
-                       class="button button-primary">
-                        Delete Instructor</a></li>
+                    <a href="{{ instructor.get_delete_url }}" class="button button-primary">
+                        Delete Instructor</a>
+                </li>
                 {% endif %}
             </ul>
 
@@ -34,6 +34,12 @@ Instructor - {{ instructor }}
                         <th>Last Name:</th>
                         <td>{{ instructor.last_name }}</td>
                     </tr>
+                    {% if instructor.disambiguator %}
+                    <tr>
+                        <th>Disambiguator:</th>
+                        <td>{{ instructor.disambiguator }}</td>
+                    </tr>
+                    {% endif %}
                     <tr>
                         <th>Instructor Like:</th>
                         <td>{{ instructor.instructor_like }}</td>
@@ -50,42 +56,40 @@ Instructor - {{ instructor }}
             </section>
             <ul class="inline">
                 <li>
-                    <a
-                            href="{{ instructor.get_like_update_url }}"
-                            class="button button-primary">
-                        Like</a></li>
+                    <a href="{{ instructor.get_like_update_url }}" class="button button-primary">
+                        Like</a>
+                </li>
                 <li>
-                    <a
-                            href="{{ instructor.get_dislike_update_url }}"
-                            class="button button-primary">
-                        Dislike</a></li>
+                    <a href="{{ instructor.get_dislike_update_url }}" class="button button-primary">
+                        Dislike</a>
+                </li>
             </ul>
             <div class="chart-container">
-                    <canvas id="likeDislikeChart"></canvas>
-                </div>
-                <script>
-                    const likeDislikeData = {
-                        labels: ['Likes', 'Dislikes'],
-                        datasets: [{
-                            data: [{{ instructor.instructor_like }}, {{ instructor.instructor_dislike }}],
-                            backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
-                            borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-                            borderWidth: 1
+                <canvas id="likeDislikeChart"></canvas>
+            </div>
+            <script>
+                const likeDislikeData = {
+                    labels: ['Likes', 'Dislikes'],
+                    datasets: [{
+                        data: [{{ instructor.instructor_like }}, {{ instructor.instructor_dislike }}],
+                    backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
                         }]
                     };
 
-                    const likeDislikeConfig = {
-                        type: 'pie',
-                        data: likeDislikeData,
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
-                    };
+                const likeDislikeConfig = {
+                    type: 'pie',
+                    data: likeDislikeData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                };
 
-                    const ctx = document.getElementById('likeDislikeChart').getContext('2d');
-                    const likeDislikeChart = new Chart(ctx, likeDislikeConfig);
-                </script>
+                const ctx = document.getElementById('likeDislikeChart').getContext('2d');
+                const likeDislikeChart = new Chart(ctx, likeDislikeConfig);
+            </script>
 
             <section>
                 <h3>Sections</h3>
@@ -101,19 +105,19 @@ Instructor - {{ instructor }}
             </section>
             <h3>Comments</h3>
             {% for review in instructor.reviews.all %}
-    <div class="review">
-        <p><strong>{{ review.user }}:</strong> {{ review.comment }}</p>
-        <p><small>{{ review.date_created }}</small></p>
-    </div>
-{% empty %}
-    <p>No reviews yet.</p>
-{% endfor %}
+            <div class="review">
+                <p><strong>{{ review.user }}:</strong> {{ review.comment }}</p>
+                <p><small>{{ review.date_created }}</small></p>
+            </div>
+            {% empty %}
+            <p>No reviews yet.</p>
+            {% endfor %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ review_form.as_p }}
-    <button type="submit" class="button button-primary">Add Comment</button>
-</form>
+            <form method="post">
+                {% csrf_token %}
+                {{ review_form.as_p }}
+                <button type="submit" class="button button-primary">Add Comment</button>
+            </form>
 
         </div>
     </div> <!-- row -->
@@ -121,4 +125,3 @@ Instructor - {{ instructor }}
 </article>
 
 {% endblock %}
-
