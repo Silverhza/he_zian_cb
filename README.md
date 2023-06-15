@@ -2,7 +2,7 @@
 
 ## Special Virtual Environment
 
-Same as EZU.
+See requirements.txt
 
 ## Application Description
 
